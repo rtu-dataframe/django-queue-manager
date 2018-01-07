@@ -10,7 +10,6 @@ configs.**
 `Settings <#settings>`__
 `Run the Tasks Queue Server <#run-the-tasks-queue-server>`__
 `Persistency <#persistency>`__
-`Failed Tasks <#failed-tasks>`__
 `Run the Tasks Queue on Another Server <#run-the-tasks-queue-on-another-server>`__
 
 Why?
@@ -42,7 +41,7 @@ The SocketServer istance can be one or multiple, depending on your app requireme
 
 You send a task request to the default SocketServer with:
 
-::
+
 
     from mysite.django-queue-manager.API import push_task_to_queue
     ...
@@ -50,13 +49,13 @@ You send a task request to the default SocketServer with:
 
 Sending email might look like:
 
-::
+
 
     push_task_to_queue(send_mail,subject="foo",message="baz",recipient_list=[user.email])
 
 If you have more of one SocketServer istance, you can specify the parameter dqmqueue, in order to send the task to another queue, like below:
 
-::
+
 	specific_queue = DQMQueue.objects.get(description='foo_queue')
     push_task_to_queue(send_mail,subject="foo",message="baz",recipient_list=[user.email], dqmqueue=specific_queue)
 
@@ -98,7 +97,7 @@ Install
 
 3. Migrate:
 
-   ::
+   
 
        $ manange.py migrate
 
@@ -129,7 +128,7 @@ task before skipping it. The default is 3.
 So, in a nutshell, for using multiple queues, simply add a new queue
 in the admin page and pass the istance of a valid ``DQMQueue`` object in the function like below:
 
-::
+
 
     from mysite.django-queue-manager.API import push_task_to_queue
     ...
@@ -146,7 +145,7 @@ Start the Server
 From shell or a process control system, run the following script with python >= 3
 (if you use a VirtualEnv, specify the environment path in supervisor conf.d file):
 
-::
+
 
     import os
 	os.environ.setdefault("DJANGO_SETTINGS_MODULE", "YOUR-APP-NAME.settings")
@@ -174,7 +173,7 @@ Django-queue-manager, provides a simple script called ``shell.py``
 that it's useful in order to see how the queue, worker and server it's going on,
 the base syntax it's really simple
 
-::
+
 
     $ python <package-install-dir>/shell.py queue-host queue-port command
 
@@ -184,7 +183,7 @@ Stop the Server
 
 To stop the worker thread gracefully:
 
-::
+
 
     $ python django-queue-manager/shell.py localhost 8002 stop
     Sent: ping
@@ -193,7 +192,7 @@ To stop the worker thread gracefully:
 This will send a stop event to the Worker thread. Check that the Worker
 thread stopped:
 
-::
+
 
     $ python django-queue-manager/shell.py localhost 8002 ping
     Sent: ping
@@ -201,7 +200,7 @@ thread stopped:
 
 Now you can safely stop SocketServer:
 
-::
+
 
     $ ps ax | grep django-queue-manager
     12345 pts/1 S 7:20 <process name>
@@ -212,7 +211,7 @@ Ping the Server
 
 From shell:
 
-::
+
 
     $ python django-queue-manager/shell.py localhost 8002 ping
     Sent: ping
@@ -223,7 +222,7 @@ Tasks that are waiting on the Queue
 
 From shell:
 
-::
+
 
     $ python django-queue-manager/shell.py localhost 8002 waiting
     Sent: waiting
@@ -236,7 +235,7 @@ Count total tasks handled to the Queue
 
 From shell:
 
-::
+
 
     $ python django-queue-manager/shell.py localhost 8002 handled
     Sent: handled
@@ -254,13 +253,13 @@ Use shell.py script for another Queue
 From shell, it's very easy to use the above command with another Queue,
 in a simple way, change the hostname and host port values:
 
-::
+
 
     $ python django-queue-manager/shell.py localhost 8003 ping
     Sent: ping
     Received: (True, "I'm OK")
 
-::
+
 
     $ python django-queue-manager/shell.py 10.50.3.100 8007 ping
     Sent: ping
