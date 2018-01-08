@@ -7,8 +7,11 @@ from django_queue_manager.task_manager import TaskManager
 
 def requeue_task(modeladmin, request, queryset):
     for task in queryset:
-        TaskManager.retry_task(task)
+        TaskManager.requeue_task(task)
 
+def retry_task(modeladmin, request, queryset):
+    for task in queryset:
+        TaskManager.retry_failed_task(task)
 
 class QueuedModelAdmin(admin.ModelAdmin):
     readonly_fields = ('task_function_name','task_args', 'task_kwargs','pickled_task', 'dqmqueue', 'queued_on', )
@@ -27,7 +30,7 @@ class SuccessModelAdmin(admin.ModelAdmin):
 class FailedModelAdmin(admin.ModelAdmin):
     readonly_fields = ('task_function_name', 'task_args', 'task_kwargs','task_id', 'pickled_task', 'failed_on', 'dqmqueue', 'exception', )
 
-    actions = [requeue_task]
+    actions = [retry_task]
 
     def has_add_permission(self, request):
         return False

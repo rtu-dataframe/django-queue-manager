@@ -88,8 +88,8 @@ class TaskManager:
 		task_to_delete.delete()
 
 	@staticmethod
-	def retry_task(task):
-		'''Used to retry tasks'''
+	def retry_failed_task(task):
+		'''Used to retry failed task'''
 
 		#Unpacking the task
 		unpacked_task = TaskManager.unpack(task.pickled_task)
@@ -98,6 +98,21 @@ class TaskManager:
 
 		#Deletes the task
 		task_to_delete = models.FailedTasks.objects.get(pk=task.pk)
+		task_to_delete.delete()
+
+		TaskManager.send_to_queue(requeued_task)
+
+	@staticmethod
+	def requeue_task(task):
+		'''Used to retry failed task'''
+
+		#Unpacking the task
+		unpacked_task = TaskManager.unpack(task.pickled_task)
+		#Save a new istance of task to the Default Queue
+		requeued_task = TaskManager.save_task_to_db(unpacked_task)
+
+		#Deletes the task
+		task_to_delete = models.QueuedTasks.objects.get(pk=task.pk)
 		task_to_delete.delete()
 
 		TaskManager.send_to_queue(requeued_task)
