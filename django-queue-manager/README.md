@@ -1,19 +1,25 @@
-Django Queue Manager
-====================
+
+# Django Queue Manager
+
 
 **A simple async tasks queue via a django app and SocketServer, zero
 configs.**
 
-`Why? <#why>`__
-`Overview <#overview>`__
-`Install <#install>`__
-`Settings <#settings>`__
-`Run the Tasks Queue Server <#run-the-tasks-queue-server>`__
-`Persistency <#persistency>`__
-`Run the Tasks Queue on Another Server <#run-the-tasks-queue-on-another-server>`__
+ - [Why?](#why)
+   
+ - [Overview](#Overview)
+        
+ - [Install](#Install)
+       
+ - [Settings](#Settings)
+          
+ - [Run the Tasks Queue Server](#Run-the-Tasks-Queue-Server)
+            
+ - [Persistency](#Persistency)
+   
+ - [Run the Tasks Queue on Another Server](#Run-the-Tasks-Queue-on-Another-Server)
 
-Why?
-----
+## <a name="why"></a>Why?
 
 Although Celery is pretty much the standard for a django tasks queue
 solution, it can be complex to install and config.
@@ -29,8 +35,9 @@ traffic, and the scalability is really required.
 
 In addition, the Django-queue-manager provides a simple and stunning easy-to-use interface in the admin backend page
 
-Overview
---------
+
+## <a name="Overview"></a>Overview:
+
 
 In a nutshell, a python SocketServer runs in the background, and listens
 to a tcp socket. SocketServer gets the request to run a task from it's
@@ -42,54 +49,46 @@ The SocketServer istance can be one or multiple, depending on your app requireme
 You send a task request to the default SocketServer with:
 
 
-
     from mysite.django-queue-manager.API import push_task_to_queue
     ...
     push_task_to_queue(a_callable, *args, **kwargs)
 
 Sending email might look like:
 
-
-
     push_task_to_queue(send_mail,subject="foo",message="baz",recipient_list=[user.email])
 
 If you have more of one SocketServer istance, you can specify the parameter dqmqueue, in order to send the task to another queue, like below:
 
-
 	specific_queue = DQMQueue.objects.get(description='foo_queue')
     push_task_to_queue(send_mail,subject="foo",message="baz",recipient_list=[user.email], dqmqueue=specific_queue)
 
-
-Components
-~~~~~~~~~~
+### Components:
 
 1. Python SocketServer that listens to a tcp socket.
 2. A Worker thread.
 3. A python Queue
 
-Workflow
-~~~~~~~~
+### Workflow:
 
 The workflow that runs an async task:
 
 1. When ``SocketServer`` starts, it initializes the ``Worker`` thread.
 2. ``SocketServer`` listens to requests.
-3. When ``SocketServer`` receives a request - a callables with args and
-   kwargs - it puts the request on a python ``Queue``.
+3. When ``SocketServer`` receives a request - a callables with args and kwargs - it puts the request on a python ``Queue``.
 4. The ``Worker`` thread picks a task from the ``Queue``.
 5. The ``Worker`` thread runs the task.
 
-Can this queue scale to production?
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Depends on the traffic: SocketServer is simple, but solid, and as the
+### Can this queue scale to production?:
+
+Absolutely!: SocketServer is simple, but solid, and as the
 site gets more traffic, it's possible to move the django-queue-manager server to
 another machine, separate database, use multiple istance of SocketServer, etc...
 At some point, probably, it's better to pick Celery. Until then, django-queue-manager is a simple, solid, and
 no-hustle solution.
 
-Install
--------
+
+## <a name="Install"></a>Install:
 
 1. Install the django-queue-manager with the following pip command ``pip3 install django-queue-manager``.
 
@@ -97,16 +96,14 @@ Install
 
 3. Migrate:
 
-   
-
        $ manange.py migrate
 
 4. The django-queue-manager app has an API module, with a ``push_task_to_queue``
    function. Use this function to send callables with args and kwargs to the queue,
    you can specify a specific queue with the parameter dqmqueue or use the default one if none it's specified, for the async run.
 
-Settings
---------
+## <a name="Settings"></a>Settings:
+
 
 To change the default django-queue-manager settings, you can modify the backend default queue present in the django admin pages.
 
@@ -136,11 +133,10 @@ in the admin page and pass the istance of a valid ``DQMQueue`` object in the fun
     push_task_to_queue(send_mail,subject="foo",message="baz",recipient_list=[user.email], dqmqueue=specific_queue)
 
 
-Run the Tasks Queue Server
---------------------------
+## <a name="Run-the-Tasks-Queue-Server"></a>Run the Tasks Queue Server:
 
-Start the Server
-~~~~~~~~~~~~~~~~
+
+### Start the Server:
 
 From shell or a process control system, run the following script with python >= 3
 (if you use a VirtualEnv, specify the environment path in supervisor conf.d file):
@@ -166,8 +162,8 @@ From shell or a process control system, run the following script with python >= 
 name of your app, like that: "email_sender.settings")*
 
 
-The Shell interface
-~~~~~~~~~~~~~~~~~~~
+### The Shell interface:
+
 
 Django-queue-manager, provides a simple script called ``shell.py``
 that it's useful in order to see how the queue, worker and server it's going on,
@@ -177,9 +173,7 @@ the base syntax it's really simple
 
     $ python <package-install-dir>/shell.py queue-host queue-port command
 
-Stop the Server
-~~~~~~~~~~~~~~~
-
+### Stop the server:
 
 To stop the worker thread gracefully:
 
@@ -206,23 +200,16 @@ Now you can safely stop SocketServer:
     12345 pts/1 S 7:20 <process name>
     $ sudo kill 12345
 
-Ping the Server
-~~~~~~~~~~~~~~~
-
+### Ping the server:
 From shell:
-
-
 
     $ python django-queue-manager/shell.py localhost 8002 ping
     Sent: ping
     Received: (True, "I'm OK")
 
-Tasks that are waiting on the Queue
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+### Tasks that are waiting on the Queue:
 
 From shell:
-
-
 
     $ python django-queue-manager/shell.py localhost 8002 waiting
     Sent: waiting
@@ -230,8 +217,7 @@ From shell:
 
 115 tasks are waiting on the queue
 
-Count total tasks handled to the Queue
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+### Count total tasks handled to the Queue
 
 From shell:
 
@@ -247,36 +233,19 @@ started
 *Note: If you use the tasks server commands a lot, add shell aliases for
 these commands*
 
-Use shell.py script for another Queue
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-From shell, it's very easy to use the above command with another Queue,
-in a simple way, change the hostname and host port values:
 
 
 
-    $ python django-queue-manager/shell.py localhost 8003 ping
-    Sent: ping
-    Received: (True, "I'm OK")
+## <a name="Persistency"></a>Persistency:
 
-
-
-    $ python django-queue-manager/shell.py 10.50.3.100 8007 ping
-    Sent: ping
-    Received: (True, "I'm OK")
-
-
-Persistency
------------
-
-Tasks saved in the database
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+### *Tasks are saved in the database: why not! you already have a DB!*
 
 **QueuedTasks** The model saves every tasks pushed to the queue and not yet processed.
 The task is pickled as a ``django-queue-manager.task_manager.Task`` object, which is a
-simple class with a ``callable``,\ ``args``, ``dqmqueue`` and ``kwargs`` attributes,
-and one method: ``run()``. After a successful execution, the QueuedTasks will be deleted
-and moved into the ``SuccessTask`` queue.
+simple class with a ``callable``, ``args``, ``dqmqueue`` and ``kwargs`` attributes,
+and one method: ``run()``. 
+
+*After a successful execution, the QueuedTasks will be deleted and moved into the ``SuccessTask`` queue.*
 
 *Note: If you use the requeue task function in the django admin dropdown action, the
 selected tasks will be requeued like NEW TASKS (with a new ``task_id``) in the ``QueuedTasks`` table.*
@@ -285,30 +254,42 @@ selected tasks will be requeued like NEW TASKS (with a new ``task_id``) in the `
 with all informations like above:
 
 ``task_function_name``: The complete function name like "module.function_name"
+
 ``task_args``: The variable list arguments in plain text
+
 ``task_kwargs``: The dictionary arguments in plain text
+
 ``task_id``: The task id carried from the initial QueuedTask istance
+
 ``success_on``: The success datetime
+
 ``pickled_task``: The complete pickled task
+
 ``dqmqueue``: The reference of the dqmqueue queue istance
 
 **FailedTasks** After the Worker tries to run a task several times
 according to ``max_retries``(specified in the dqmqueue used), and the task still fails, the Worker saves it to this model with all informations like above:
 
 ``task_function_name``: The complete function name like "module.function_name"
+
 ``task_args``: The variable list arguments in plain text
+
 ``task_kwargs``: The dictionary arguments in plain text
+
 ``task_id``: The task id carried from the initial QueuedTask istance
+
 ``failed_on``: The last failed run datetime
+
 ``exception``: The exception message, only the exception from the last run is saved.
+
 ``pickled_task``: The complete pickled task
+
 ``dqmqueue``: The reference of the dqmqueue queue istance
 
 *Note: If you use the requeue task function in the django admin dropdown action, the
 selected tasks will be requeued like NEW TASKS (with a new ``task_id``) in the ``QueuedTasks`` table.*
 
-Purge Tasks
-~~~~~~~~~~~
+### Purge Tasks:
 
 According to your project needs, you can purge tasks using the django admin
 interface or manually with a query execution.
@@ -316,8 +297,7 @@ interface or manually with a query execution.
 In a similar way, delete the failed/success tasks. You can run a cron script, or
 other script, to purge the tasks.
 
-Connections
-~~~~~~~~~~~
+### Connections:
 
 If most of the tasks require a specific connection, such as SMTP or a
 database, you can subclass (...or edit directly) the Worker class and add a ping or other check
@@ -326,7 +306,7 @@ not avaialable, just try to re-connect.
 
 Otherwise the Worker will just run and fail a lot of tasks.
 
-Run the Tasks Queue on Another Server
+<a name="Run-the-Tasks-Queue-on-Another-Server"></a>Run the Tasks Queue on Another Server:
 -------------------------------------
 
 The same ``django-queue-manager`` app can run from another server, and provide a
