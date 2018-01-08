@@ -1,5 +1,6 @@
 LICENSE
 MANIFEST.in
+README.md
 setup.py
 django_queue_manager/API.py
 django_queue_manager/__init__.py

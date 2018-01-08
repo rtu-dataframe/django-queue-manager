@@ -3,6 +3,8 @@ import logging
 import threading
 import queue as Queue
 import uuid
+
+import time
 from django_queue_manager.task_manager import TaskManager
 
 logging.basicConfig(level=logging.DEBUG, format='[%(levelname)s] (%(threadName)-10s) %(message)s', )
@@ -97,6 +99,10 @@ class Worker(threading.Thread):
 				self.logger.info('Removing task with id {db_id} and name {name} from enqueued list!'.format(
 					name=task.task_function_name,
 					db_id=task.db_id))
+
+			else:
+				#In order to respect the CPU sleeps for 5 milliseconds when the queue it's empty
+				time.sleep(0.005)
 
 		self.worker_queue = None
 		self.logger.warning('Worker stopped, {0} tasks handled'.format(self.tasks_counter))
