@@ -27,7 +27,7 @@ class QueuedTasks(models.Model):
 	task_kwargs = models.TextField()
 	pickled_task = models.TextField()
 	queued_on = models.DateTimeField(auto_now_add=True)
-	dqmqueue = models.ForeignKey(DQMQueue)
+	dqmqueue = models.ForeignKey(DQMQueue, on_delete=models.CASCADE)
 
 	def __str__(self):
 		return "Job-Id: {job_id} -> Function Name: {function_name} -> Queued on: {queued_on}".format(job_id=self.pk,
@@ -46,7 +46,7 @@ class SuccessTasks(models.Model):
 	task_id = models.IntegerField()
 	success_on = models.DateTimeField(auto_now_add=True)
 	pickled_task = models.TextField()
-	dqmqueue = models.ForeignKey(DQMQueue)
+	dqmqueue = models.ForeignKey(DQMQueue, on_delete=models.CASCADE)
 
 	def __str__(self):
 		return "Job-Id: {job_id} -> Function Name: {function_name} -> Success on: {success_on}".format(
@@ -67,7 +67,7 @@ class FailedTasks(models.Model):
 	exception = models.TextField()
 	failed_on = models.DateTimeField(auto_now_add=True)
 	pickled_task = models.TextField()
-	dqmqueue = models.ForeignKey(DQMQueue)
+	dqmqueue = models.ForeignKey(DQMQueue, on_delete=models.CASCADE)
 
 	def __str__(self):
 		return "Job-Id: {job_id} -> Function Name: {function_name} -> Failed on: {failed_on}".format(
