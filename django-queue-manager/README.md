@@ -1,5 +1,5 @@
 
-# Django Queue Manager
+# Django Queue Manager (DQM)
 
 
 **A simple async tasks queue via a django app and SocketServer, zero
@@ -92,7 +92,7 @@ no-hustle solution.
 
 1. Install the django-queue-manager with the following pip command ``pip3 install django-queue-manager``.
 
-2. Add ``django-queue-manager`` in the ``INSTALLED_APPS`` list.
+2. Add ``django_queue_manager`` in the ``INSTALLED_APPS`` list.
 
 3. Migrate:
 
@@ -127,7 +127,7 @@ in the admin page and pass the istance of a valid ``DQMQueue`` object in the fun
 
 
 
-    from mysite.django-queue-manager.API import push_task_to_queue
+    from mysite.django_queue_manager.API import push_task_to_queue
     ...
 	specific_queue = DQMQueue.objects.get(description='foo_queue')
     push_task_to_queue(send_mail,subject="foo",message="baz",recipient_list=[user.email], dqmqueue=specific_queue)
@@ -179,7 +179,7 @@ To stop the worker thread gracefully:
 
 
 
-    $ python django-queue-manager/shell.py localhost 8002 stop
+    $ python django_queue_manager/shell.py localhost 8002 stop
     Sent: ping
     Received: (False, 'Worker Off')
 
@@ -188,7 +188,7 @@ thread stopped:
 
 
 
-    $ python django-queue-manager/shell.py localhost 8002 ping
+    $ python django_queue_manager/shell.py localhost 8002 ping
     Sent: ping
     Received: (False, 'Worker Off')
 
@@ -196,14 +196,14 @@ Now you can safely stop SocketServer:
 
 
 
-    $ ps ax | grep django-queue-manager
+    $ ps ax | grep django_queue_manager
     12345 pts/1 S 7:20 <process name>
     $ sudo kill 12345
 
 ### Ping the server:
 From shell:
 
-    $ python django-queue-manager/shell.py localhost 8002 ping
+    $ python django_queue_manager/shell.py localhost 8002 ping
     Sent: ping
     Received: (True, "I'm OK")
 
@@ -211,7 +211,7 @@ From shell:
 
 From shell:
 
-    $ python django-queue-manager/shell.py localhost 8002 waiting
+    $ python django_queue_manager/shell.py localhost 8002 waiting
     Sent: waiting
     Received: (True, 115)
 
@@ -223,7 +223,7 @@ From shell:
 
 
 
-    $ python django-queue-manager/shell.py localhost 8002 handled
+    $ python django_queue_manager/shell.py localhost 8002 handled
     Sent: handled
     Received: (True, 862)
 
@@ -241,7 +241,7 @@ these commands*
 ### *Tasks are saved in the database: why not! you already have a DB!*
 
 **QueuedTasks** The model saves every tasks pushed to the queue and not yet processed.
-The task is pickled as a ``django-queue-manager.task_manager.Task`` object, which is a
+The task is pickled as a ``django_queue_manager.task_manager.Task`` object, which is a
 simple class with a ``callable``, ``args``, ``dqmqueue`` and ``kwargs`` attributes,
 and one method: ``run()``. 
 
@@ -309,7 +309,7 @@ Otherwise the Worker will just run and fail a lot of tasks.
 <a name="Run-the-Tasks-Queue-on-Another-Server"></a>Run the Tasks Queue on Another Server:
 -------------------------------------
 
-The same ``django-queue-manager`` app can run from another server, and provide a
+The same ``django_queue_manager`` app can run from another server, and provide a
 seprate server queue for the async tasks.
 
 Here is a simple way to do it:
