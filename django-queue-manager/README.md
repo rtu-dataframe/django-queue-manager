@@ -33,7 +33,7 @@ This queue app is a simple, up and running queueing solution. The more
 complex distributed queues can wait until the website has a lot of
 traffic, and the scalability is really required.
 
-In addition, the Django-queue-manager provides a simple and stunning easy-to-use interface in the admin backend page
+In addition, the django_queue_manager provides a simple and stunning easy-to-use interface in the admin backend page
 
 
 ## <a name="Overview"></a>Overview:
@@ -49,7 +49,7 @@ The SocketServer istance can be one or multiple, depending on your app requireme
 You send a task request to the default SocketServer with:
 
 
-    from mysite.django-queue-manager.API import push_task_to_queue
+    from mysite.django_queue_manager.API import push_task_to_queue
     ...
     push_task_to_queue(a_callable, *args, **kwargs)
 
@@ -82,15 +82,15 @@ The workflow that runs an async task:
 ### Can this queue scale to production?:
 
 Absolutely!: SocketServer is simple, but solid, and as the
-site gets more traffic, it's possible to move the django-queue-manager server to
+site gets more traffic, it's possible to move the django_queue_manager server to
 another machine, separate database, use multiple istance of SocketServer, etc...
-At some point, probably, it's better to pick Celery. Until then, django-queue-manager is a simple, solid, and
+At some point, probably, it's better to pick Celery. Until then, django_queue_manager is a simple, solid, and
 no-hustle solution.
 
 
 ## <a name="Install"></a>Install:
 
-1. Install the django-queue-manager with the following pip command ``pip3 install django-queue-manager``.
+1. Install the django_queue_manager with the following pip command ``pip3 install django_queue_manager``.
 
 2. Add ``django_queue_manager`` in the ``INSTALLED_APPS`` list.
 
@@ -98,14 +98,14 @@ no-hustle solution.
 
        $ manange.py migrate
 
-4. The django-queue-manager app has an API module, with a ``push_task_to_queue``
+4. The django_queue_manager app has an API module, with a ``push_task_to_queue``
    function. Use this function to send callables with args and kwargs to the queue,
    you can specify a specific queue with the parameter dqmqueue or use the default one if none it's specified, for the async run.
 
 ## <a name="Settings"></a>Settings:
 
 
-To change the default django-queue-manager settings, you can modify the backend default queue present in the django admin pages.
+To change the default django_queue_manager settings, you can modify the backend default queue present in the django admin pages.
 
 In a glance, the queue, has the following parameters:
 
@@ -165,7 +165,7 @@ name of your app, like that: "email_sender.settings")*
 ### The Shell interface:
 
 
-Django-queue-manager, provides a simple script called ``shell.py``
+django_queue_manager, provides a simple script called ``shell.py``
 that it's useful in order to see how the queue, worker and server it's going on,
 the base syntax it's really simple
 
