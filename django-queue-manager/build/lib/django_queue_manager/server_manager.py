@@ -17,7 +17,6 @@ class TaskSocketServer(SocketServer.BaseRequestHandler):
 
         try:
             data = self.request.recv(4096).strip()  # like the pickled task field
-            data = data.decode()
         except Exception as e:
             response = (False, "SocketServer: {0}".format(e))
             self.request.send(response)

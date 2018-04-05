@@ -34,14 +34,14 @@ class TaskManager:
     @staticmethod
     def unpack(pickled_task):
         '''Used to get back the picked tasks'''
-        new_task = pickle.loads(base64.b64decode(pickled_task))
+        new_task = pickle.loads(pickled_task)
         assert isinstance(new_task, Task)
         return new_task
 
     @staticmethod
     def serialize_task(task):
         '''Used to serialize tasks'''
-        return base64.b64encode(pickle.dumps(task))
+        return pickle.dumps(task)
 
     @staticmethod
     def save_task_to_db(new_task):

@@ -25,7 +25,7 @@ class QueuedTasks(models.Model):
     task_function_name = models.TextField()
     task_args = models.TextField()
     task_kwargs = models.TextField()
-    pickled_task = models.TextField()
+    pickled_task = models.BinaryField()
     queued_on = models.DateTimeField(auto_now_add=True)
     dqmqueue = models.ForeignKey(DQMQueue, on_delete=models.CASCADE)
 
@@ -45,7 +45,7 @@ class SuccessTasks(models.Model):
     task_kwargs = models.TextField()
     task_id = models.IntegerField()
     success_on = models.DateTimeField(auto_now_add=True)
-    pickled_task = models.TextField()
+    pickled_task = models.BinaryField()
     dqmqueue = models.ForeignKey(DQMQueue, on_delete=models.CASCADE)
 
     def __str__(self):
@@ -66,7 +66,7 @@ class FailedTasks(models.Model):
     task_id = models.IntegerField()
     exception = models.TextField()
     failed_on = models.DateTimeField(auto_now_add=True)
-    pickled_task = models.TextField()
+    pickled_task = models.BinaryField()
     dqmqueue = models.ForeignKey(DQMQueue, on_delete=models.CASCADE)
 
     def __str__(self):
