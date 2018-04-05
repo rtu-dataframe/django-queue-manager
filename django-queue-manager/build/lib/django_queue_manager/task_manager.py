@@ -5,7 +5,6 @@ import socket
 
 from django_queue_manager import models
 
-
 # Defines the Task Class
 from django_queue_manager.models import DQMQueue
 
@@ -15,7 +14,7 @@ class Task(object):
         assert callable(a_callable)
 
         if not dqmqueue:
-            #Use the default DQMQueue
+            # Use the default DQMQueue
             dqmqueue = DQMQueue.objects.first()
 
         self.task_function_name = "{module}.{function}".format(module=inspect.getmodule(a_callable).__name__,
@@ -91,12 +90,12 @@ class TaskManager:
     def retry_failed_task(task):
         '''Used to retry failed task'''
 
-        #Unpacking the task
+        # Unpacking the task
         unpacked_task = TaskManager.unpack(task.pickled_task)
-        #Save a new istance of task to the Default Queue
+        # Save a new istance of task to the Default Queue
         requeued_task = TaskManager.save_task_to_db(unpacked_task)
 
-        #Deletes the task
+        # Deletes the task
         task_to_delete = models.FailedTasks.objects.get(pk=task.pk)
         task_to_delete.delete()
 
@@ -106,12 +105,12 @@ class TaskManager:
     def requeue_task(task):
         '''Used to retry failed task'''
 
-        #Unpacking the task
+        # Unpacking the task
         unpacked_task = TaskManager.unpack(task.pickled_task)
-        #Save a new istance of task to the Default Queue
+        # Save a new istance of task to the Default Queue
         requeued_task = TaskManager.save_task_to_db(unpacked_task)
 
-        #Deletes the task
+        # Deletes the task
         task_to_delete = models.QueuedTasks.objects.get(pk=task.pk)
         task_to_delete.delete()
 
