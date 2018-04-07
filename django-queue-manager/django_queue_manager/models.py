@@ -30,9 +30,10 @@ class QueuedTasks(models.Model):
     dqmqueue = models.ForeignKey(DQMQueue, on_delete=models.CASCADE)
 
     def __str__(self):
-        return "Job-Id: {job_id} -> Function Name: {function_name} -> Queued on: {queued_on}".format(job_id=self.pk,
-                                                                                                     function_name=self.task_function_name,
-                                                                                                     queued_on=self.queued_on)
+        return "Job-Id: {job_id} -> Function Name: {function_name} -> Queued on: {queued_on} -> Queue: {queue}".format(
+            job_id=self.pk,
+            function_name=self.task_function_name,
+            queued_on=self.queued_on, queue=self.dqmqueue.description)
 
     class Meta:
         verbose_name = 'Queued Task'
@@ -49,10 +50,10 @@ class SuccessTasks(models.Model):
     dqmqueue = models.ForeignKey(DQMQueue, on_delete=models.CASCADE)
 
     def __str__(self):
-        return "Job-Id: {job_id} -> Function Name: {function_name} -> Success on: {success_on}".format(
+        return "Job-Id: {job_id} -> Function Name: {function_name} -> Success on: {success_on} -> Queue: {queue}".format(
             job_id=self.task_id,
             function_name=self.task_function_name,
-            success_on=self.success_on)
+            success_on=self.success_on, queue=self.dqmqueue.description)
 
     class Meta:
         verbose_name = 'Success Task'
@@ -70,10 +71,10 @@ class FailedTasks(models.Model):
     dqmqueue = models.ForeignKey(DQMQueue, on_delete=models.CASCADE)
 
     def __str__(self):
-        return "Job-Id: {job_id} -> Function Name: {function_name} -> Failed on: {failed_on}".format(
+        return "Job-Id: {job_id} -> Function Name: {function_name} -> Failed on: {failed_on} -> Queue: {queue}".format(
             job_id=self.task_id,
             function_name=self.task_function_name,
-            failed_on=self.failed_on)
+            failed_on=self.failed_on, queue=self.dqmqueue.description)
 
     class Meta:
         verbose_name = 'Failed Task'
