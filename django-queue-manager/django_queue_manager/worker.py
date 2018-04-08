@@ -7,7 +7,7 @@ import uuid
 import time
 from django_queue_manager.task_manager import TaskManager
 
-logging.basicConfig(level=logging.DEBUG, format='[%(levelname)s] (%(threadName)-10s) %(message)s', )
+logging.basicConfig(level=logging.DEBUG, format='[%(levelname)s] %(message)s', )
 
 
 class Worker(threading.Thread):
@@ -71,42 +71,38 @@ class Worker(threading.Thread):
         # the code until the while statement does NOT run atomicaly
         # a thread while loop cycle is atomic
         # thread safe locals: L = threading.local(), then L.foo="baz"
-
-        try:
-            self.logger.info('Worker Thread Starts')
-            while not self._stopevent.isSet():
-                if not self.worker_queue.empty():
-                    try:
-                        task = self.worker_queue.get()
-                        self.logger.info('Consuming Task: \n|-> Task Id: {db_id}'.format(
-                            name=task.task_function_name,
-                            db_id=task.db_id))
-                        self.run_task(task)
-
-                        # Save it on the success table
-                        TaskManager.save_task_success(task)
-                        self.logger.info(
-                            'Task with id {db_id} success!'.format(name=task.task_function_name,
-                                                                   db_id=task.db_id))
-                    except Exception as e:
-                        # Save it on the failed table
-                        TaskManager.save_task_failed(task, e)
-
-                        self.logger.warning(
-                            'Task with id {db_id} failed!'.format(name=task.task_function_name,
-                                                                  db_id=task.db_id))
-
-                    # Removes the enqueued task from the DB after execution or failure
-                    TaskManager.delete_enqueued_task(task)
-                    self.logger.info('Removing task with id {db_id} from enqueued list!'.format(
+        self.logger.info('Worker Thread Starts')
+        while not self._stopevent.isSet():
+            if not self.worker_queue.empty():
+                try:
+                    task = self.worker_queue.get()
+                    self.logger.info('Consuming Task Id: {db_id}'.format(
                         name=task.task_function_name,
                         db_id=task.db_id))
+                    self.run_task(task)
 
-                else:
-                    # In order to respect the CPU sleeps for 5 milliseconds when the queue it's empty
-                    time.sleep(0.005)
+                    # Save it on the success table
+                    TaskManager.save_task_success(task)
+                    self.logger.info(
+                        'Task Id {db_id} success!'.format(name=task.task_function_name,
+                                                               db_id=task.db_id))
+                except Exception as e:
+                    # Save it on the failed table
+                    TaskManager.save_task_failed(task, e)
 
-            self.worker_queue = None
-            self.logger.warning('Worker stopped, {0} tasks handled'.format(self.tasks_counter))
-        except Exception as ex:
-            self.logger.error('Worker Thread fatal error: {exception}!'.format(exception=ex))
+                    self.logger.warning(
+                        'Task Id {db_id} failed!'.format(name=task.task_function_name,
+                                                              db_id=task.db_id))
+
+                # Removes the enqueued task from the DB after execution or failure
+                TaskManager.delete_enqueued_task(task)
+                self.logger.info('Removing Task Id {db_id} from enqueued tasks!'.format(
+                    name=task.task_function_name,
+                    db_id=task.db_id))
+
+            else:
+                # In order to respect the CPU sleeps for 50 milliseconds when the queue it's empty
+                time.sleep(0.050)
+
+        self.worker_queue = None
+        self.logger.warning('Worker Thread stopped, {0} tasks handled'.format(self.tasks_counter))

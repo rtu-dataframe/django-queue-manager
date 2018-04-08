@@ -1,4 +1,3 @@
-import base64
 import pickle
 import inspect
 import socket
@@ -10,7 +9,7 @@ from django_queue_manager.models import DQMQueue
 
 
 class Task(object):
-    def __init__(self, a_callable, dqmqueue=None, *args, **kwargs):
+    def __init__(self, a_callable, *args, dqmqueue=None, **kwargs):
         assert callable(a_callable)
 
         if not dqmqueue:

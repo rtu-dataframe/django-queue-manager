@@ -10,7 +10,7 @@ from django_queue_manager.models import DQMQueue
 
 
 def create_default_queue(apps, schema_editor):
-    default_dqmqueue = DQMQueue(description='default_queue', queue_host='localhost', queue_port=8002, max_retries=3)
+    default_dqmqueue = DQMQueue(description='default_queue', queue_host='localhost', queue_port=8003, max_retries=3)
     default_dqmqueue.save()
 
 class Migration(migrations.Migration):
