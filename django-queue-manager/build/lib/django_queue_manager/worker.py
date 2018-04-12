@@ -93,6 +93,8 @@ class Worker(threading.Thread):
                     self.logger.warning(
                         'Task Id {db_id} failed!'.format(name=task.task_function_name,
                                                               db_id=task.db_id))
+                    #Continue the loop if the task throw an exception
+                    continue
 
                 # Removes the enqueued task from the DB after execution or failure
                 TaskManager.delete_enqueued_task(task)
