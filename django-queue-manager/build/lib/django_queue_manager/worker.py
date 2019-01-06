@@ -104,8 +104,8 @@ class Worker(threading.Thread):
                     connection.close()
 
             else:
-                # In order to respect the CPU sleeps for 50 milliseconds when the queue it's empty
-                time.sleep(0.050)
+                # In order to respect the CPU sleeps for 100 milliseconds when the queue it's empty
+                time.sleep(0.100)
 
         self.worker_queue = None
         self.logger.warning('Worker Thread stopped, {0} tasks handled'.format(self.tasks_counter))
