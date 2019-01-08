@@ -6,8 +6,11 @@ import uuid
 
 import time
 from django_queue_manager.task_manager import TaskManager
+from django.conf import settings
+SAVE_SUCCESS_TASKS = getattr(settings, "SAVE_SUCCESS_TASKS", True)
 
-logging.basicConfig(level=logging.DEBUG, format='[%(levelname)s] %(message)s', )
+from django_queue_manager.utilities.loggers import get_default_logger
+logger = get_default_logger(__name__)
 
 
 class Worker(threading.Thread):
@@ -15,7 +18,7 @@ class Worker(threading.Thread):
 
         threading.Thread.__init__(self, name=str(uuid.uuid4()))
         self._stopevent = threading.Event()
-        self.setDaemon(1)
+        self.setDaemon(True)
         self.worker_queue = Queue.Queue()
         self.tasks_counter = 0
 
@@ -81,10 +84,11 @@ class Worker(threading.Thread):
                     self.run_task(task)
 
                     # Save it on the success table
-                    TaskManager.save_task_success(task)
-                    self.logger.info(
-                        'Task Id {db_id} success!'.format(name=task.task_function_name,
-                                                          db_id=task.db_id))
+                    if SAVE_SUCCESS_TASKS:
+                        TaskManager.save_task_success(task)
+                        self.logger.info(
+                            'Task Id {db_id} success!'.format(name=task.task_function_name,
+                                                              db_id=task.db_id))
                 except Exception as e:
                     # Save it on the failed table
                     TaskManager.save_task_failed(task, e)

@@ -2,7 +2,8 @@ import logging
 import socket
 from django_queue_manager.task_manager import Task, TaskManager
 
-logging.basicConfig(level=logging.DEBUG, format='[%(levelname)s] %(message)s', )
+from django_queue_manager.utilities.loggers import get_default_logger
+logger = get_default_logger(__name__)
 
 
 def push_task_to_queue(a_callable, *args, dqmqueue=None, **kwargs):

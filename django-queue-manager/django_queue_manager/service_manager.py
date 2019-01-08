@@ -8,7 +8,6 @@ class ServiceManager:
     def service_start(self):
         worker_manager.start()
         server_thread = TaskSocketServerThread('localhost', DQMQueue.objects.first().queue_port)
-        time.sleep(5)
         socket_server = server_thread.socket_server()
         socket_server.serve_forever()
 
