@@ -17,6 +17,7 @@ django_queue_manager.egg-info/PKG-INFO
 django_queue_manager.egg-info/SOURCES.txt
 django_queue_manager.egg-info/dependency_links.txt
 django_queue_manager.egg-info/top_level.txt
+django_queue_manager/migrations/0001_initial.py
 django_queue_manager/migrations/__init__.py
 django_queue_manager/utilities/__init__.py
 django_queue_manager/utilities/loggers.py

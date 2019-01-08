@@ -75,9 +75,10 @@ class Worker(threading.Thread):
         # the queue and move the task into success/failed tasks in base of successful or not execution.
         self.logger.info('Worker Thread Starts')
         while not self._stopevent.isSet():
-            if not self.worker_queue.empty():
+                task = self.worker_queue.get()
+                if task == None:
+                    break
                 try:
-                    task = self.worker_queue.get()
                     self.logger.info('Consuming Task Id: {db_id}'.format(
                         name=task.task_function_name,
                         db_id=task.db_id))
@@ -100,16 +101,15 @@ class Worker(threading.Thread):
                     continue
 
                 finally:
-                    # In any case, it will dequeue the task form the queued tasks
-                    self.dequeue_task(task=task)
+
+                    if task:
+                        # In any case, it will dequeue the task form the queued tasks
+                        self.dequeue_task(task=task)
 
                     # Close the connection, in order to prevent (2006, 'MySQL server has gone away') timeout error
                     from django.db import connection
                     connection.close()
 
-            else:
-                # In order to respect the CPU sleeps for 50 milliseconds when the queue it's empty
-                time.sleep(0.100)
 
         self.worker_queue = None
         self.logger.warning('Worker Thread stopped, {0} tasks handled'.format(self.tasks_counter))
