@@ -1,4 +1,5 @@
 #  Based on the Worker class from Python in a nutshell, by Alex Martelli
+import django
 import logging
 import threading
 import queue as Queue
@@ -7,9 +8,11 @@ import uuid
 import time
 from django_queue_manager.task_manager import TaskManager
 from django.conf import settings
+
 SAVE_SUCCESS_TASKS = getattr(settings, "SAVE_SUCCESS_TASKS", True)
 
 from django_queue_manager.utilities.loggers import get_default_logger
+
 logger = get_default_logger(__name__)
 
 
@@ -74,45 +77,41 @@ class Worker(threading.Thread):
         # The code above will run indefinitely except when a thread _stopevent.isSet(), it will try to empty
         # the queue and move the task into success/failed tasks in base of successful or not execution.
         self.logger.info('Worker Thread Starts')
+        django.setup()
         while not self._stopevent.isSet():
-                try:
-                    task = self.worker_queue.get()
+            try:
+                task = self.worker_queue.get()
 
-                    self.logger.info('Consuming Task Id: {db_id}'.format(
-                        name=task.task_function_name,
-                        db_id=task.db_id))
-                    self.run_task(task)
+                django.db.connection.close()
 
-                    # Save it on the success table
-                    if SAVE_SUCCESS_TASKS:
-                        TaskManager.save_task_success(task)
-                        self.logger.info(
-                            'Task Id {db_id} success!'.format(name=task.task_function_name,
-                                                              db_id=task.db_id))
-                except Queue.Empty:
-                    continue
+                self.logger.info('Consuming Task Id: {db_id}'.format(
+                    name=task.task_function_name,
+                    db_id=task.db_id))
+                self.run_task(task)
 
-                except Exception as e:
-                    # Save it on the failed table
-                    TaskManager.save_task_failed(task, e)
+                # Save it on the success table
+                if SAVE_SUCCESS_TASKS:
+                    TaskManager.save_task_success(task)
+                    self.logger.info(
+                        'Task Id {db_id} success!'.format(name=task.task_function_name,
+                                                          db_id=task.db_id))
+            except Exception as e:
+                # Save it on the failed table
+                TaskManager.save_task_failed(task, e)
 
-                    self.logger.warning(
-                        'Task Id {db_id} failed!'.format(name=task.task_function_name,
-                                                         db_id=task.db_id))
-                    # Continue the loop if the task throw an exception
-                    continue
+                self.logger.warning(
+                    'Task Id {db_id} failed!'.format(name=task.task_function_name,
+                                                     db_id=task.db_id))
+                # Continue the loop if the task throw an exception
+                continue
 
-                finally:
+            finally:
 
-                    if task:
-                        # In any case, it will dequeue the task form the queued tasks
-                        self.dequeue_task(task=task)
+                if task:
+                    # In any case, it will dequeue the task form the queued tasks
+                    self.dequeue_task(task=task)
 
-                    self.worker_queue.task_done()
-
-                    # Close the connection, in order to prevent (2006, 'MySQL server has gone away') timeout error
-                    from django.db import connection
-                    connection.close()
+                django.db.connection.close()
 
         self.worker_queue = None
         self.logger.warning('Worker Thread stopped, {0} tasks handled'.format(self.tasks_counter))
