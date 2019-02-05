@@ -77,41 +77,46 @@ class Worker(threading.Thread):
         # The code above will run indefinitely except when a thread _stopevent.isSet(), it will try to empty
         # the queue and move the task into success/failed tasks in base of successful or not execution.
         self.logger.info('Worker Thread Starts')
-        django.setup()
         while not self._stopevent.isSet():
-            try:
-                task = self.worker_queue.get()
+            if not self.worker_queue.empty():
+                task = None
+                try:
+                    task = self.worker_queue.get()
 
-                django.db.connection.close()
+                    self.logger.info('Consuming Task Id: {db_id}'.format(
+                        name=task.task_function_name,
+                        db_id=task.db_id))
+                    self.run_task(task)
 
-                self.logger.info('Consuming Task Id: {db_id}'.format(
-                    name=task.task_function_name,
-                    db_id=task.db_id))
-                self.run_task(task)
+                    # Save it on the success table
+                    if SAVE_SUCCESS_TASKS:
+                        TaskManager.save_task_success(task)
+                        self.logger.info(
+                            'Task Id {db_id} success!'.format(name=task.task_function_name,
+                                                              db_id=task.db_id))
+                except Exception as e:
+                    # Save it on the failed table
+                    if task:
+                        TaskManager.save_task_failed(task, e)
 
-                # Save it on the success table
-                if SAVE_SUCCESS_TASKS:
-                    TaskManager.save_task_success(task)
-                    self.logger.info(
-                        'Task Id {db_id} success!'.format(name=task.task_function_name,
-                                                          db_id=task.db_id))
-            except Exception as e:
-                # Save it on the failed table
-                TaskManager.save_task_failed(task, e)
+                    self.logger.warning(
+                        'Task Id {db_id} failed!'.format(name=task.task_function_name,
+                                                         db_id=task.db_id))
+                    # Continue the loop if the task throw an exception
+                    continue
 
-                self.logger.warning(
-                    'Task Id {db_id} failed!'.format(name=task.task_function_name,
-                                                     db_id=task.db_id))
-                # Continue the loop if the task throw an exception
-                continue
+                finally:
 
-            finally:
+                    if task:
+                        # In any case, it will dequeue the task form the queued tasks
+                        self.dequeue_task(task=task)
 
-                if task:
-                    # In any case, it will dequeue the task form the queued tasks
-                    self.dequeue_task(task=task)
-
-                django.db.connection.close()
+                    from django.db import connection
+                    if connection.connection is not None:
+                        connection.close()
+            else:
+                # In order to respect the CPU sleeps for 100 milliseconds when the queue it's empty
+                time.sleep(0.100)
 
         self.worker_queue = None
         self.logger.warning('Worker Thread stopped, {0} tasks handled'.format(self.tasks_counter))
